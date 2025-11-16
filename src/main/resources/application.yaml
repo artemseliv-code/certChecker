@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: certChecker
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+certificates:
+  search:
+    path: "D:\\certs"
+
+
+keystore-passwords:
+  - password1
+  - password2
+  - password3
+
+logging:
+  level:
+    ru.alfabank.certChecker: INFO
