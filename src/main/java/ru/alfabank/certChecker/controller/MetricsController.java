@@ -123,7 +123,8 @@ public class MetricsController {
                     System.out.println("перечень сертификатов" + cert.getCertificateName());
 
                     metrics.append(String.format(
-                            "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            "certificate_info{file=\"%s\\%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            searchPath,
                             escapeLabelValue(cert.getFileName()),
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
