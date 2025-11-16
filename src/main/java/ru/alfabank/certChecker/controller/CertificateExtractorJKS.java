@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import ru.alfabank.certChecker.controller.KeystorePasswordProvider;
 
 public class CertificateExtractorJKS {
 
@@ -55,12 +56,13 @@ public class CertificateExtractorJKS {
 
     private List<String> loadKeystorePasswordsFromConfig() {
         List<String> passwords = new ArrayList<>();
-
+        List<String> confPass = ru.alfabank.certChecker.controller.KeystorePasswordProvider.getPassword();
 
         // Здесь должна быть логика загрузки паролей из конфигурации
         // Временная реализация с дефолтными паролями
-        passwords.add("changeit");
+        passwords.addAll(confPass);
         passwords.add("");
+        System.out.println("Загрузки паролей из конфигурации");
         passwords.forEach(System.out::println);
         return passwords;
     }

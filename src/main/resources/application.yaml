@@ -21,13 +21,14 @@ management:
 
 certificates:
   search:
-    path: "D:\\certs"
+    path: "C:\\temp\\certs"
 
 
-keystore-passwords:
-  - password1
-  - password2
-  - password3
+keystore:
+  passwords:
+    - password1
+    - password2
+    - password3
 
 logging:
   level:

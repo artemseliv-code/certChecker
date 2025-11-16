@@ -21,8 +21,6 @@ import java.util.stream.Stream;
 @RestController
 public class MetricsController {
 
-    private final Counter helloWorldCounter;
-
     @Value("${certificates.search.path:/etc/certificates}")
     private String certificatesSearchPath;
 
@@ -30,17 +28,10 @@ public class MetricsController {
         return Paths.get(certificatesSearchPath);
     }
 
-    public MetricsController(MeterRegistry meterRegistry) {
-        this.helloWorldCounter = Counter.builder("hello_world_requests_total")
-                .description("Total number of Hello World requests")
-                .register(meterRegistry);
-    }
 
     @GetMapping("/metrics")
     public String getMetrics() {
         // Инкрементируем счетчик при каждом запросе
-        helloWorldCounter.increment();
-
         // Получаем текущее время в Unix timestamp
         long currentTime = Instant.now().getEpochSecond();
 
@@ -84,7 +75,8 @@ public class MetricsController {
                 for (CertificateExtractor.CertificateInfo cert : certificates) {
                     metrics.append(String.format(
                             "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
-                            escapeLabelValue(cert.getFileName()),
+                            pemFile,
+//                            escapeLabelValue(cert.getFileName()),
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
                             cert.isValid(),
@@ -123,9 +115,8 @@ public class MetricsController {
                     System.out.println("перечень сертификатов" + cert.getCertificateName());
 
                     metrics.append(String.format(
-                            "certificate_info{file=\"%s\\%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
-                            searchPath,
-                            escapeLabelValue(cert.getFileName()),
+                            "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            jksFile,
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
                             cert.isValid(),
