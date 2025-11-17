@@ -15,14 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import ru.alfabank.certChecker.controller.KeystorePasswordProvider;
+
 
 public class CertificateExtractorJKS {
-
-    @Value("${keystore-passwords:/etc/certificates}")
-    private List<String> configPasswords;
-
-
 
     private List<String> keystorePasswords;
 
