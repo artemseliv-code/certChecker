@@ -1,12 +1,8 @@
 package ru.alfabank.certChecker.controller;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -87,10 +83,10 @@ public class MetricsController {
 
             // Если PEM файлов не найдено, добавляем метрику с 0
             if (pemFiles.isEmpty()) {
-                metrics.append("certificate_info{file=\"none\", cert_name=\"none\", serial=\"none\", valid=\"false\"} 0\n");
+                metrics.append("certificate_info{file=\"none\", alias=\"none\", serial=\"none\", valid=\"false\"} 0\n");
             }
         } catch (Exception e) {
-            metrics.append("certificate_info{file=\"error\", cert_name=\"error\", serial=\"error\", valid=\"false\"} -1\n");
+            metrics.append("certificate_info{file=\"error\", alias=\"error\", serial=\"error\", valid=\"false\"} -1\n");
         }
 
 
@@ -115,7 +111,7 @@ public class MetricsController {
                     System.out.println("перечень сертификатов" + cert.getCertificateName());
 
                     metrics.append(String.format(
-                            "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            "certificate_info{file=\"%s\", alias=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
                             jksFile,
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
@@ -126,11 +122,11 @@ public class MetricsController {
             }
 
             if (jksFiles.isEmpty()) {
-                metrics.append("certificate_info{file=\"none\", cert_name=\"none\", serial=\"none\", valid=\"false\"} 0\n");
+                metrics.append("certificate_info{file=\"none\", alias=\"none\", serial=\"none\", valid=\"false\"} 0\n");
             }
 
         } catch (Exception e){
-            metrics.append("certificate_info{file=\"error\", cert_name=\"error\", serial=\"error\", valid=\"false\"} -1\n");
+            metrics.append("certificate_info{file=\"error\", alias=\"error\", serial=\"error\", valid=\"false\"} -1\n");
         }
 
 
@@ -185,7 +181,6 @@ public class MetricsController {
         }
         return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
     }
-
 
 
     private long getUptime() {
