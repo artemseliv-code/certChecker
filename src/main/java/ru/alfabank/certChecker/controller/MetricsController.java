@@ -46,7 +46,7 @@ public class MetricsController {
 
             metrics.append("certificate_files_count{type=\"jks\", jks_count=\"").append(jksCount).append("\" hostname=\"").append(getHostname()).append("\" }").append("\n");
 
-            metrics.append("certificate_files_count{type=\"pem\", jks_count=\"").append(pemCount).append("\" hostname=\"").append(getHostname()).append("\" }").append("\n");
+            metrics.append("certificate_files_count{type=\"pem\", pem_count=\"").append(pemCount).append("\" hostname=\"").append(getHostname()).append("\" }").append("\n");
         } catch (Exception e) {
             // В случае ошибки возвращаем -1 для обеих метрик
             metrics.append("certificate_files_count{type=\"jks\"} -1\n");
