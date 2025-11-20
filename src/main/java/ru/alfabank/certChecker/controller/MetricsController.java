@@ -11,7 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @RestController
@@ -44,9 +46,9 @@ public class MetricsController {
             long jksCount = countFilesByExtension(searchPath, "jks");
             long pemCount = countFilesByExtension(searchPath, "pem");
 
-            metrics.append("certificate_files_count{type=\"jks\", jks_count=\"").append(jksCount).append("\" hostname=\"").append(getHostname()).append("\" }").append("\n");
+            metrics.append("certificate_files_count{type=\"jks\",").append(" hostname=\"").append(getHostname()).append("\" }").append(jksCount).append("\n");
 
-            metrics.append("certificate_files_count{type=\"pem\", pem_count=\"").append(pemCount).append("\" hostname=\"").append(getHostname()).append("\" }").append("\n");
+            metrics.append("certificate_files_count{type=\"pem\",").append(" hostname=\"").append(getHostname()).append("\" }").append(pemCount).append("\n");
         } catch (Exception e) {
             // В случае ошибки возвращаем -1 для обеих метрик
             metrics.append("certificate_files_count{type=\"jks\"} -1\n");
@@ -62,7 +64,7 @@ public class MetricsController {
             CertificateExtractor extractor = new CertificateExtractor();
 
             // Ищем все PEM файлы в папке и подпапках
-            List<Path> pemFiles = findFilesByExtension(searchPath, "pem");
+            List<Path> pemFiles = findFilesByExtensions(searchPath, "pem,crt,cer");
 
             for (Path pemFile : pemFiles) {
                 List<CertificateExtractor.CertificateInfo> certificates =
@@ -97,7 +99,7 @@ public class MetricsController {
             CertificateExtractorJKS extractor = new CertificateExtractorJKS();
 
             // Ищем все JKS файлы в папке и подпапках
-            List<Path> jksFiles = findFilesByExtension(searchPath, "jks");
+            List<Path> jksFiles = findFilesByExtensions(searchPath, "jks,pks,p12");
             jksFiles.forEach(System.out::println);
 
             for (Path jksFile : jksFiles){
@@ -160,15 +162,39 @@ public class MetricsController {
         }
     }
 
-    private List<Path> findFilesByExtension(Path searchPath, String extension) throws IOException {
+    private List<Path> findFilesByExtensions(Path searchPath, String extensions) throws IOException {
         List<Path> files = new ArrayList<>();
+
+        // Разделяем строку расширений по запятой и обрабатываем
+        String[] extensionArray = extensions.split(",");
+        Set<String> extensionSet = new HashSet<>();
+
+        for (String ext : extensionArray) {
+            // Убираем пробелы и приводим к нижнему регистру
+            String cleanedExt = ext.trim().toLowerCase();
+            if (!cleanedExt.isEmpty()) {
+                extensionSet.add(cleanedExt);
+            }
+        }
+
         Files.walk(searchPath)
                 .filter(path -> {
-                    // Проверяем что это файл (не директория) и расширение совпадает
+                    if (!Files.isRegularFile(path)) {
+                        return false;
+                    }
+
                     String fileName = path.getFileName().toString().toLowerCase();
-                    return Files.isRegularFile(path) && fileName.endsWith("." + extension.toLowerCase());
+
+                    // Проверяем, заканчивается ли файл любым из расширений
+                    for (String extension : extensionSet) {
+                        if (fileName.endsWith("." + extension)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 })
                 .forEach(files::add);
+
         return files;
     }
 
