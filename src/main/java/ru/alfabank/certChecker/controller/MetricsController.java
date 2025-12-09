@@ -41,12 +41,14 @@ public class MetricsController {
 
         try {
             Path searchPath = getSearchPathFromConfig();
-            long jksCount = countFilesByExtension(searchPath, "jks");
-            long pemCount = countFilesByExtension(searchPath, "pem");
+            Set<String> extensions_jks = Set.of("jks","pks","p12");
+            Set<String> extensions_pem = Set.of("pem","crt","cer");
+            long jksCount = countFilesByExtensions(searchPath, extensions_jks );
+            long pemCount = countFilesByExtensions(searchPath, extensions_pem );
 
-            metrics.append("certificate_files_count{type=\"jks\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(jksCount).append("\n");
+            metrics.append("certificate_files_count{type=\"jks, pks, p12\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(jksCount).append("\n");
 
-            metrics.append("certificate_files_count{type=\"pem\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(pemCount).append("\n");
+            metrics.append("certificate_files_count{type=\"pem, crt, cer\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(pemCount).append("\n");
         } catch (Exception e) {
             // В случае ошибки возвращаем -1 для обеих метрик
             metrics.append("certificate_files_count{type=\"jks\"} -1\n");
@@ -144,7 +146,7 @@ public class MetricsController {
         }
     }
 
-    private long countFilesByExtension(Path directory, String extension) throws IOException {
+    private long countFilesByExtensions(Path directory, Set<String> extensions) throws IOException {
         if (!Files.exists(directory) || !Files.isDirectory(directory)) {
             return 0;
         }
@@ -154,7 +156,9 @@ public class MetricsController {
                     .filter(Files::isRegularFile)
                     .filter(path -> {
                         String fileName = path.getFileName().toString().toLowerCase();
-                        return fileName.endsWith("." + extension.toLowerCase());
+                        return extensions.stream()
+                                .map(ext -> ext.toLowerCase())
+                                .anyMatch(ext -> fileName.endsWith("." + ext));
                     })
                     .count();
         }
