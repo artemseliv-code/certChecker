@@ -46,9 +46,9 @@ public class MetricsController {
             long jksCount = countFilesByExtension(searchPath, "jks");
             long pemCount = countFilesByExtension(searchPath, "pem");
 
-            metrics.append("certificate_files_count{type=\"jks\",").append(" hostname=\"").append(getHostname()).append("\" }").append(jksCount).append("\n");
+            metrics.append("certificate_files_count{type=\"jks\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(jksCount).append("\n");
 
-            metrics.append("certificate_files_count{type=\"pem\",").append(" hostname=\"").append(getHostname()).append("\" }").append(pemCount).append("\n");
+            metrics.append("certificate_files_count{type=\"pem\",").append(" hostname=\"").append(getHostname()).append("\" } ").append(pemCount).append("\n");
         } catch (Exception e) {
             // В случае ошибки возвращаем -1 для обеих метрик
             metrics.append("certificate_files_count{type=\"jks\"} -1\n");
