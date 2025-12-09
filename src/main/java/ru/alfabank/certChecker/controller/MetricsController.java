@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -165,27 +163,32 @@ public class MetricsController {
     private List<Path> findFilesByExtensions(Path searchPath, String extensions) throws IOException {
         List<Path> files = new ArrayList<>();
 
-        // Разделяем строку расширений по запятой и обрабатываем
         String[] extensionArray = extensions.split(",");
         Set<String> extensionSet = new HashSet<>();
 
         for (String ext : extensionArray) {
-            // Убираем пробелы и приводим к нижнему регистру
             String cleanedExt = ext.trim().toLowerCase();
             if (!cleanedExt.isEmpty()) {
                 extensionSet.add(cleanedExt);
             }
         }
 
+        // Создаем PathMatcher для исключения папки CAs
+        PathMatcher excludeCAsMatcher = FileSystems.getDefault().getPathMatcher("glob:**/CAs/**");
+
         Files.walk(searchPath)
                 .filter(path -> {
+                    // Исключаем папку CAs и всё её содержимое
+                    if (excludeCAsMatcher.matches(path)) {
+                        return false;
+                    }
+
                     if (!Files.isRegularFile(path)) {
                         return false;
                     }
 
                     String fileName = path.getFileName().toString().toLowerCase();
 
-                    // Проверяем, заканчивается ли файл любым из расширений
                     for (String extension : extensionSet) {
                         if (fileName.endsWith("." + extension)) {
                             return true;
