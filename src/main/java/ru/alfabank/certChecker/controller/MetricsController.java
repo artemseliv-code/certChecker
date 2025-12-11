@@ -27,10 +27,6 @@ public class MetricsController {
 
     @GetMapping("/metrics")
     public String getMetrics() {
-        // Инкрементируем счетчик при каждом запросе
-        // Получаем текущее время в Unix timestamp
-        long currentTime = Instant.now().getEpochSecond();
-
         // Формируем ответ в формате Prometheus
         StringBuilder metrics = new StringBuilder();
 
@@ -38,6 +34,7 @@ public class MetricsController {
 
         metrics.append("# HELP certificate_files_count Number of JKS and PEM files found\n");
         metrics.append("# TYPE certificate_files_count gauge\n");
+
 
         try {
             Path searchPath = getSearchPathFromConfig();
@@ -72,12 +69,12 @@ public class MetricsController {
 
                 for (CertificateExtractor.CertificateInfo cert : certificates) {
                     metrics.append(String.format(
-                            "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            "certificate_info{file=\"%s\", cert_name=\"%s\", serial=\"%s\", valid=\"%s\", hostname=\"%s\"} %d\n",
                             pemFile,
-//                            escapeLabelValue(cert.getFileName()),
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
                             cert.isValid(),
+                            getHostname(),
                             cert.getDaysUntilExpiration()
                     ));
                 }
@@ -100,7 +97,7 @@ public class MetricsController {
 
             // Ищем все JKS файлы в папке и подпапках
             List<Path> jksFiles = findFilesByExtensions(searchPath, "jks,pks,p12");
-            jksFiles.forEach(System.out::println);
+            //jksFiles.forEach(System.out::println);
 
             for (Path jksFile : jksFiles){
 
@@ -113,11 +110,12 @@ public class MetricsController {
                     System.out.println("перечень сертификатов" + cert.getCertificateName());
 
                     metrics.append(String.format(
-                            "certificate_info{file=\"%s\", alias=\"%s\", serial=\"%s\", valid=\"%s\"} %d\n",
+                            "certificate_info{file=\"%s\", alias=\"%s\", serial=\"%s\", valid=\"%s\", hostname=\"%s\"} %d\n",
                             jksFile,
                             escapeLabelValue(cert.getCertificateName()),
                             escapeLabelValue(cert.getSerialNumber()),
                             cert.isValid(),
+                            getHostname(),
                             cert.getDaysUntilExpiration()
                     ));
                 }

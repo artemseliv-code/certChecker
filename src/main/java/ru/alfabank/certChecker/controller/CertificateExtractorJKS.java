@@ -58,16 +58,16 @@ public class CertificateExtractorJKS {
         passwords.addAll(confPass);
         passwords.add("");
         System.out.println("Загрузки паролей из конфигурации");
-        passwords.forEach(System.out::println);
+        //passwords.forEach(System.out::println);
         return passwords;
     }
 
     public List<CertificateInfo> extractCertificatesFromJks(Path jksFile) {
         List<CertificateInfo> certificates = new ArrayList<>();
-        System.out.println("обрабатываю файл " + jksFile);
+        //System.out.println("обрабатываю файл " + jksFile);
 
         for (String password : keystorePasswords) {
-            System.out.println("пароль " + password);
+            //System.out.println("пароль " + password);
 
             try {
                 KeyStore keyStore = KeyStore.getInstance("JKS");
