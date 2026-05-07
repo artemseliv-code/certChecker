@@ -80,6 +80,7 @@ public class CertificateExtractor {
                     -1,
                     false
             );
+            System.out.println("Не могу открыть файл" + errorCert.certificateName);
             certificates.add(errorCert);
         }
 

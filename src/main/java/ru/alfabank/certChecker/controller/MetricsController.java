@@ -85,6 +85,7 @@ public class MetricsController {
                 metrics.append("certificate_info{file=\"none\", alias=\"none\", serial=\"none\", valid=\"false\"} 0\n");
             }
         } catch (Exception e) {
+            System.out.println("Ошибка в файле" + e.toString());
             metrics.append("certificate_info{file=\"error\", alias=\"error\", serial=\"error\", valid=\"false\"} -1\n");
         }
 
@@ -107,7 +108,7 @@ public class MetricsController {
 
 
                 for (CertificateExtractorJKS.CertificateInfo cert : certificates) {
-                    System.out.println("перечень сертификатов" + cert.getCertificateName());
+                    System.out.println("перечень сертификатов " + cert.getCertificateName());
 
                     metrics.append(String.format(
                             "certificate_info{file=\"%s\", alias=\"%s\", serial=\"%s\", valid=\"%s\", hostname=\"%s\"} %d\n",
